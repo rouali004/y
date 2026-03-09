@@ -1,38 +1,62 @@
-const CACHE_NAME = 'ziyarat-ashura-v1';
+const CACHE_NAME = 'ashura-visit-v1';
 const urlsToCache = [
-  '/y/',
-  '/y/index.html',
-  '/y/manifest.json'
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
-self.addEventListener('install', event => {
+// Install event - cache files
+self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-      .catch(err => console.log('Cache failed:', err))
+      .then((cache) => {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
+      })
   );
   self.skipWaiting();
 });
 
-self.addEventListener('fetch', event => {
+// Fetch event - serve from cache
+self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
-      .then(response => response || fetch(event.request))
-      .catch(() => caches.match('/y/index.html'))
+      .then((response) => {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request)
+          .then((response) => {
+            if (!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                cache.put(event.request, responseToCache);
+              });
+            return response;
+          });
+      })
   );
 });
 
-self.addEventListener('activate', event => {
+// Activate event - clean old caches
+self.addEventListener('activate', (event) => {
+  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
+        cacheNames.map((cacheName) => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
             return caches.delete(cacheName);
           }
         })
       );
     })
   );
-  return self.clients.claim();
+  self.clients.claim();
 });
+    
