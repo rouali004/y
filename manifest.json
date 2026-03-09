@@ -1,10 +1,9 @@
 {
   "name": "زيارة عاشوراء",
   "short_name": "زيارة عاشوراء",
-  "description": "تطبيق لقراءة زيارة عاشوراء مع عداد للتكرارات",
-  "id": "/y/",
-  "start_url": "/y/",
-  "scope": "/y/",
+  "description": "تطبيق لقراءة زيارة عاشوراء مع عداد للتكرارات - السلام عليك يا أبا عبد الله الحسين",
+  "id": "/",
+  "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f172a",
@@ -24,3 +23,4 @@
     }
   ]
 }
+    
